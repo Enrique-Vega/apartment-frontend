@@ -7,6 +7,8 @@ class Login extends Component {
     super()
     this.Auth = new AuthService()
     this.state={
+      loggedInSuccess: false,
+      errors:"",
       user: {
         email: '',
         password: ''
@@ -30,16 +32,19 @@ class Login extends Component {
   }
 
   handleFormSubmit = (e) => {
-    let { email, password } = this.state
     e.preventDefault()
-    console.log(e);
-    this.Auth.login(email, password)
-    .then(res =>{
-      console.log(res);
-      this.props.history.replace('/')
+    this.Auth.login(this.state)
+    .then(json =>{
+      console.log("handling any errors");
+      if(json.errors) {
+        this.setState({errors: json.errors})
+      }
+      return json
     })
-    .catch(err =>{ alert(err) })
-  }
+    if (this.Auth.loggedIn()) this.setState({
+      loggedInSuccess: true
+  })
+}
 
   render() {
     return (
