@@ -1,17 +1,44 @@
 import React, { Component } from 'react';
 import '../css/Login.css';
+import AuthService from '../services/AuthService'
 
 class Login extends Component {
   constructor(){
     super()
+    this.Auth = new AuthService()
     this.state={
-      email: '',
-      password: ''
+      user: {
+        email: '',
+        password: ''
+      }
     }
   }
 
-  handleChange(e){
-    this.setState({ [e.target.name]: e.target.value })
+  handleChange = (e) => {
+    let { user } = this.state
+
+        // copy event target name and value (target will be a form field)
+        let fieldName = e.target.name
+        let inputValue = e.target.value
+
+        console.log(inputValue, fieldName);
+
+        // update form object with new value from user
+        user[fieldName] = inputValue
+
+    this.setState({user})
+  }
+
+  handleFormSubmit = (e) => {
+    let { email, password } = this.state
+    e.preventDefault()
+    console.log(e);
+    this.Auth.login(email, password)
+    .then(res =>{
+      console.log(res);
+      this.props.history.replace('/')
+    })
+    .catch(err =>{ alert(err) })
   }
 
   render() {
@@ -19,13 +46,13 @@ class Login extends Component {
       <div className="center">
         <div className="card">
           <h1>Login</h1>
-          <form>
+          <form onSubmit={this.handleFormSubmit}>
             <input
               className="form-item"
               placeholder="email goes here..."
               name="email"
               type="text"
-              onChange={this.handleChange.bind(this)}
+              onChange={this.handleChange}
               value={this.state.email}
             />
             <input
@@ -33,7 +60,7 @@ class Login extends Component {
               placeholder="Password goes here..."
               name="password"
               type="password"
-              onChange={this.handleChange.bind(this)}
+              onChange={this.handleChange}
               value={this.state.password}
             />
             <input
